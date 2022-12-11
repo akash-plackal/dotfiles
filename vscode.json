@@ -1,0 +1,23 @@
+{
+  "editor.stickyScroll.enabled": true,
+  "editor.lineNumbers": "relative",
+  "diffEditor.renderSideBySide": false,
+  "security.workspace.trust.untrustedFiles": "open",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "prettier.tabWidth": 4,
+  "workbench.startupEditor": "none",
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'monospace', monospace",
+  "editor.fontLigatures": true,
+  "window.zoomLevel": 0.7,
+  "workbench.colorTheme": "One Dark Pro Darker",
+  "workbench.colorCustomizations": {
+    "editor.background": "#1c1f24"
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "window.dialogStyle": "custom",
+  "window.titleBarStyle": "custom",
+  "editor.cursorSmoothCaretAnimation": true,
+  "editor.cursorBlinking": "phase"
+}

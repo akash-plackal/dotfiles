@@ -1,0 +1,8 @@
+
+========== to fix screen taring in linux ==========
+
+cd to /etc/X11/xorg.conf.d
+
+created a file with the cpu name (in change folder)
+
+
