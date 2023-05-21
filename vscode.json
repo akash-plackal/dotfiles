@@ -2,22 +2,41 @@
   "editor.stickyScroll.enabled": true,
   "editor.lineNumbers": "relative",
   "diffEditor.renderSideBySide": false,
-  "security.workspace.trust.untrustedFiles": "open",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.wordWrap": "on",
   "editor.formatOnSave": true,
+  "editor.fontSize": 14.5,
+  "workbench.colorCustomizations": {
+    "editor.background": "#1c1f24"
+  },
   "editor.formatOnPaste": true,
+  "files.trimTrailingWhitespace": true,
   "prettier.tabWidth": 4,
   "workbench.startupEditor": "none",
   "editor.fontFamily": "'JetBrainsMono Nerd Font', 'monospace', monospace",
   "editor.fontLigatures": true,
-  "window.zoomLevel": 0.7,
   "workbench.colorTheme": "One Dark Pro Darker",
-  "workbench.colorCustomizations": {
-    "editor.background": "#1c1f24"
-  },
   "typescript.updateImportsOnFileMove.enabled": "always",
   "window.dialogStyle": "custom",
-  "window.titleBarStyle": "custom",
-  "editor.cursorSmoothCaretAnimation": true,
-  "editor.cursorBlinking": "phase"
+  // "editor.cursorSmoothCaretAnimation": "on",
+  "editor.cursorBlinking": "phase",
+  "explorer.confirmDragAndDrop": false,
+  "workbench.sideBar.location": "right",
+  "explorer.confirmDelete": false,
+  "editor.accessibilitySupport": "off",
+  "workbench.editor.pinnedTabSizing": "compact",
+  "editor.glyphMargin": false,
+  "workbench.editor.wrapTabs": true,
+  "window.menuBarVisibility": "hidden",
+  // "emmet.includeLanguages": {
+  //     "javascript": "javascriptreact"
+  // },
+  "editor.scrollBeyondLastLine": false,
+  "editor.cursorSurroundingLines": 99,
+  "editor.minimap.autohide": true,
+  "breadcrumbs.enabled": false,
+  "workbench.editor.enablePreview": false,
+  "zenMode.hideLineNumbers": false,
+  "zenMode.hideTabs": false,
+  "window.zoomLevel": 1.2
 }

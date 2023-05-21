@@ -24,6 +24,7 @@ set $mod Mod1
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3
+exec --no-startup-id dex --autostart --environment  Gnome-terminal
 
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
@@ -49,8 +50,9 @@ floating_modifier $mod
 # start a terminal
 bindsym $mod+Return exec gnome-terminal
 
+
 # kill focused window
-bindsym $mod+q kill
+bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
 bindsym $mod+space exec --no-startup-id i3-dmenu-desktop
@@ -184,20 +186,21 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
-
-# bar {
-#         status_command i3blocks
-#         # status_command i3status
-# }
-
+  # google-chrome  https://mail.google.com/chat/u/0/#chat/space/AAAASLUiRwg; \ ﮫ
 bar {
-	status_command /home/akash/.local/bin/bumblebee-status -m github git battery memory time date \
-	-p  cpu.format=' {:.01f}%' date.format=" %a, %b %d" \
-  github.token="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"  \
-  time.format=" %I:%M" memory.format='({percent:05.02f}%)' -t gruvbox-powerline
+	status_command /home/akash/.local/bin/bumblebee-status -m time date bluetooth2 memory battery system  \
+	-p  cpu.format=' {:.01f}%' date.format=" %a, %b %d" time.format=" %I:%M" memory.format='({percent:05.02f}%)'  \
+   -t iceberg-rainbow
   position top
+  # shortcut.labels=' ; ; 羽 ; ;﬏ ' \
+  # shortcut.cmds=' google-chrome https://github.com/MTechZilla/hotel-reservation-management-app ; \
+  # google-chrome https://meet.google.com/bvh-rtvx-pag?authuser=0 ; \
+  # google-chrome https://www.jibble.io/app/dashboard ; \
+  # google-chrome http://localhost:3000/bookings; \
+  # code '\
+
+  #  -t night-powerline
+  # -t gruvbox-powerline
 
  colors {
         background #000000
@@ -229,24 +232,43 @@ set  $EDITOR='/usr/bin/lvim'              # default text editor
 set $VISUAL='/usr/bin/lvim'
 set $PAGER='/usr/bin/lvim'
 
-exec_always feh --bg-scale /home/akash/Downloads/backgrounds/room.jpg
+exec_always feh --bg-scale /home/akash/Downloads/backgrounds/room2.jpeg
 
- bindsym Mod4+B exec --no-startup-id google-chrome
- bindsym Mod4+S exec --no-startup-id flameshot screen
- bindsym Mod4+Shift+S exec --no-startup-id flameshot gui
+ bindsym Mod4+L exec --no-startup-id google-chrome  https://web.jibble.io/dashboard  https://app.cronbot.ai/dashboard  https://app.slack.com/client/T046XRHDJ7Q/D0505QHPVRC
+
+ bindsym Mod4+B exec --no-startup-id google-chrome  http://localhost:3000/search
+ bindsym Mod4+G exec --no-startup-id google-chrome https://github.com/MTechZilla/hotel-reservation-management-app
+ bindsym Mod4+D exec --no-startup-id google-chrome https://www.figma.com/file/YanxeJstWahlkyVfB4hsl4/New-Safe-Stays-and-Hotel-Reservation-Management?node-id=51%3A5789&t=JuYT8IBjJHjwsyyp-0
+ bindsym $mod+Shift+Return  exec --no-startup-id alacritty
+
+ bindsym Mod4+Shift+S exec --no-startup-id flameshot screen
  bindsym Mod4+F exec gnome-terminal -e "ranger"
+
  bindsym $mod+I exec dmenu_run
 
+ bindsym $mod+Shift+minus [class="Alacritty"] move scratchpad
+ bindsym $mod+o [class="Alacritty"] scratchpad show resize set 1500px 1000px; move position center
+ # bindsym $mod+o [class="Alacritty"] scratchpad show resize set 1800px 1200px; move position center
+
 # Make the currently focused window a scratchpad
- bindsym $mod+Shift+minus [class="Gnome-terminal"] move scratchpad
-
- bindsym $mod+o [class="Gnome-terminal"] scratchpad show
-
- exec_always --no-startup-id  Gnome-terminal
+bindsym $mod+Shift+v move scratchpad
+# Show the first scratchpad window
+bindsym $mod+minus scratchpad show
 
 
-# addigning windows to specific workspace
-for_window [class="Code"] move to workspace $ws1
+  # bindsym $mod+o [class="Alacritty"] scratchpad show; \
+  # [con_id="__focused__"] resize set 98 ppt 95 ppt; \
+  # [con_id="__focused__"] move position center
+
+
+# adding windows to specific workspace
+
+ for_window [class="Code"] move to workspace $ws1
+# for_window [class="Google-chrome"] move to workspace $ws2
+
+ # gaps outer 15px
+ gaps inner 15px
+ for_window [con_id=1] border pixel 1
 
 
 
