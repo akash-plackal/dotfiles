@@ -1,0 +1,29 @@
+[user]
+    name = Akash Plackal
+	email = akashplackal@gmail.com
+[core]
+	editor = nvim
+    pager = delta
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true    # use n and N to move between diff sections
+    line-numbers = true
+[merge]
+    conflictstyle = diff3
+
+[includeIf "gitdir:/Users/akashplackal/work/"]
+    path = /Users/akashplackal/.gitconfig-work
+
+[diff]
+    colorMoved = default
+    algorithm = histogram
+[push]
+    default = simple
+    autoSetupRemote = true
+[rerere]
+	enabled = true
+[branch]
+	sort = -committerdate
+[help]
+  autocorrect = prompt

@@ -1,0 +1,34 @@
+#theme = Guezwhoz
+theme = Hybrid
+#theme = vesper 
+#theme = Harper
+
+#font-family = JetBrainsMono NFM Bold
+#font-family = Monoid
+font-family = Iosevka term
+font-size = 19.5
+font-feature = -calt
+font-feature = -dlig
+font-feature = -liga
+background = "#282828"
+keybind = global:cmd+o=toggle_quick_terminal
+
+mouse-hide-while-typing = true
+mouse-scroll-multiplier = 2
+copy-on-select = clipboard
+
+window-decoration=client
+window-padding-balance = true 
+window-save-state = always
+window-colorspace = "display-p3"
+#background = 1C2021
+#foreground = d4be98
+
+macos-icon = blueprint
+quit-after-last-window-closed = true
+confirm-close-surface = false
+
+
+#macos-titlebar-style = hidden
+#macos-non-native-fullscreen = true
+#window-padding-y = 8 

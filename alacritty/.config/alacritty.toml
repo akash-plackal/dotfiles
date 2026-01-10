@@ -1,0 +1,32 @@
+
+# note : this should be under .config/alacritty/alacritty.toml
+
+# =============================
+# Font configuration
+# =============================
+[font]
+size = 20.0
+
+[font.normal]
+family = "Iosevka Term"
+style = "Regular"
+
+[font.bold]
+family = "Iosevka Term"
+style = "Bold"
+
+# =============================
+# Window configuration
+# =============================
+[window]
+decorations = "Full"
+dynamic_padding = true
+startup_mode = "Windowed"
+option_as_alt = "Both"
+
+[window.padding]
+x = 10
+y = 10
+
+# =============================
+# Colors (Gruvbox-like,

@@ -1,0 +1,121 @@
+# Gruvbox colors
+# bg0     = "#282828"
+# bg1     = "#3c3836"
+# fg      = "#ebdbb2"
+# red     = "#cc241d"
+# green   = "#98971a"
+# yellow  = "#d79921"
+# blue    = "#458588"
+# purple  = "#b16286"
+# aqua    = "#689d6a"
+# orange  = "#d65d0f"
+# gray    = "#928374"
+
+add_newline = false
+
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$git_metrics\
+$fill\
+$cmd_duration $jobs\
+$line_break\
+$character"""
+
+[fill]
+symbol = " "
+
+[directory]
+style = "#689d6a"
+read_only = " "
+truncation_length = 4
+truncate_to_repo = false
+# Add these options for better directory display
+home_symbol = "~"
+format = "[$path]($style)[$read_only]($read_only_style) "
+
+[character]
+success_symbol = "[;](#b16286)"
+error_symbol = "[;](#cc241d)"
+vicmd_symbol = "[;](#98971a)"
+
+[git_branch]
+symbol = " "
+format = "[$symbol$branch]($style) "
+style = "#928374"
+
+[jobs]
+symbol = ""
+style = "bold #cc241d"
+number_threshold = 1
+format = "[$symbol]($style)"
+
+[git_status]
+format = '([\[$all_status$ahead_behind\]]($style) )'
+style = "#458588"
+# Add these for more detailed git status
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+renamed = "»"
+deleted = "✘"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "#928374"
+
+[git_metrics]
+disabled = false
+# Add format specification for metrics
+format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+
+[cmd_duration]
+format = "[$duration]($style)"
+style = "#d79921"
+# Add these for better duration formatting
+min_time = 2000
+show_milliseconds = false
+
+[memory_usage]
+symbol = " "
+# Add these for better memory usage display
+disabled = false
+threshold = 75
+style = "bold #d65d0f"
+format = "$symbol[$ram_pct]($style) "
+
+[time]
+disabled = false
+style = "bold #ebdbb2"
+format = "[$time]($style)"
+# Add these for better time formatting
+time_format = "%H:%M"
+utc_time_offset = "local"
+
+# Additional useful modules you might want to add:
+
+[nodejs]
+format = "[$symbol($version )]($style)"
+style = "#98971a"
+symbol = " "
+
+[package]
+format = "[$symbol$version]($style) "
+style = "#d79921"
+symbol = "📦 "
+
+[username]
+style_user = "#98971a"
+style_root = "#cc241d"
+format = "[$user]($style) "
+disabled = false
+show_always = false
+
+[hostname]
+ssh_only = true
+format = "[$hostname](bold #d65d0f) "
+disabled = false
