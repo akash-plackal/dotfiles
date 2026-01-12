@@ -255,8 +255,9 @@ return {
 				register_and_enable(name, {})
 			end
 
-			-- TypeScript 7 native (tsgo)
-			register_and_enable("tsgo", {})
+			register_and_enable("ts_ls", {
+				cmd = { "typescript-language-server", "--stdio" },
+			})
 
 			-- Servers with explicit/extra config
 			register_and_enable("cssls", {
