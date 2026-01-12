@@ -5,7 +5,8 @@
 # Font configuration
 # =============================
 [font]
-size = 20.0
+size = 14.5
+builtin_box_drawing = true
 
 [font.normal]
 family = "Iosevka Term"
@@ -19,7 +20,7 @@ style = "Bold"
 # Window configuration
 # =============================
 [window]
-decorations = "Full"
+decorations = "None"
 dynamic_padding = true
 startup_mode = "Windowed"
 option_as_alt = "Both"
@@ -28,5 +29,13 @@ option_as_alt = "Both"
 x = 10
 y = 10
 
+
+[cursor]
+unfocused_hollow = false
+
+[cursor.style]
+blinking = "On"
+shape = "Beam"
+
 # =============================
-# Colors (Gruvbox-like,
+
