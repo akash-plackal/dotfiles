@@ -21,14 +21,13 @@ style = "Bold"
 # =============================
 [window]
 decorations = "None"
-dynamic_padding = true
-startup_mode = "Windowed"
+#dynamic_padding = true
+#startup_mode = "Windowed"
 option_as_alt = "Both"
 
-[window.padding]
-x = 10
-y = 10
-
+ [window.padding]
+ x = 4
+ y = 4
 
 [cursor]
 unfocused_hollow = false

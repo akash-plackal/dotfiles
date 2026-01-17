@@ -1,0 +1,51 @@
+* {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", sans-serif;
+    font-size: 11px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(18, 18, 18, 0.85);
+    border-radius: 12px;
+    margin: 6px 10px;
+    padding: 2px 6px;
+    color: #eaeaea;
+}
+
+/* Workspace pills */
+#workspaces button {
+    background: transparent;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin: 0 2px;
+    color: #9a9a9a;
+}
+
+#workspaces button.focused {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+/* Window title */
+#window {
+    color: #cfcfcf;
+    margin-left: 8px;
+}
+
+/* Groovebox-style blocks */
+#clock,
+#cpu,
+#memory,
+#battery,
+#network,
+#tray {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin: 0 3px;
+}
+
+/* Tray icons tighter */
+#tray > .item {
+    padding: 0 4px;
+}

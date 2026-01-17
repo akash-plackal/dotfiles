@@ -47,7 +47,7 @@ return {
 				},
 				overrides = {},
 				dim_inactive = false,
-				transparent_mode = true,
+				transparent_mode = false,
 			})
 			vim.cmd("colorscheme gruvbox")
 		end,
@@ -166,70 +166,107 @@ return {
 	},
 
 	-- Treesitter configuration
-	{
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		event = { "BufReadPost", "BufNewFile" },
-		config = function()
-			require("nvim-treesitter.configs").setup({
-				ensure_installed = {
-					"javascript",
-					"typescript",
-					"tsx",
-					"lua",
-					"vimdoc",
-					"markdown",
-					"markdown_inline",
-					"query",
-					"regex",
-				},
-				sync_install = false,
-				auto_install = true,
-				highlight = {
-					enable = true,
-					disable = function(lang, buf)
-						local max_filesize = 100 * 1024
-						local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-						if ok and stats and stats.size > max_filesize then
-							return true
-						end
-					end,
-					additional_vim_regex_highlighting = false,
-				},
-				indent = {
-					enable = true,
-				},
-				textobjects = {
-					select = {
-						enable = true,
-						lookahead = true,
-						keymaps = {
-							["af"] = "@function.outer",
-							["if"] = "@function.inner",
-							["ac"] = "@class.outer",
-							["ai"] = "@conditional.outer",
-							["ii"] = "@conditional.inner",
-							["aa"] = "@parameter.outer",
-							["ia"] = "@parameter.inner",
-							["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
-							["as"] = { query = "@scope", query_group = "locals", desc = "Select language scope" },
-						},
-						selection_modes = {
-							["@parameter.outer"] = "v",
-							["@function.outer"] = "V",
-							["@class.outer"] = "<c-v>",
-						},
-						include_surrounding_whitespace = true,
-					},
-				},
-			})
 
-			-- Force update problematic parsers
-			vim.defer_fn(function()
-				vim.cmd("TSUpdate query regex")
-			end, 1000)
-		end,
-	},
+{
+  {
+    "nvim-treesitter/nvim-treesitter",
+    event = { "BufReadPost", "BufNewFile" },
+    -- lazy = false,
+    branch = "main",
+    version = false,
+    build = ":TSUpdate",
+    dependencies = { "RRethy/nvim-treesitter-endwise" },
+    config = function()
+      local ts = require("nvim-treesitter")
+      local ts_cfg = require("nvim-treesitter.config")
+      local parsers = require("nvim-treesitter.parsers")
+
+      local ensure_installed = {
+        "bash",
+        "c",
+        "comment",
+        "css",
+        "diff",
+        "dockerfile",
+        "git_config",
+        "git_rebase",
+        "gitcommit",
+        "gitignore",
+        "go",
+        "html",
+        "javascript",
+        "jsdoc",
+        "json",
+        "lua",
+        "markdown",
+        "python",
+        "regex",
+        "ruby",
+        "rust",
+        "sql",
+        "tmux",
+        "toml",
+        "typescript",
+        "xml",
+        "yaml",
+        "zsh",
+      }
+      local installed = ts_cfg.get_installed()
+      local to_install = vim
+        .iter(ensure_installed)
+        :filter(function(parser)
+          return not vim.tbl_contains(installed, parser)
+        end)
+        :totable()
+
+      if #to_install > 0 then
+        ts.install(to_install)
+      end
+
+      local ignore_filetype = {
+        "checkhealth",
+        "lazy",
+        "mason",
+        "snacks_dashboard",
+        "snacks_notif",
+        "snacks_win",
+        "snacks_input",
+        "snacks_picker_input",
+        "TelescopePrompt",
+        "alpha",
+        "dashboard",
+        "spectre_panel",
+        "NvimTree",
+        "undotree",
+        "Outline",
+        "sagaoutline",
+        "copilot-chat",
+        "vscode-diff-explorer",
+      }
+
+      local group = vim.api.nvim_create_augroup("TreesitterSetup", { clear = true })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        group = group,
+        desc = "Enable TreeSitter highlighting and indentation",
+        callback = function(ev)
+          local ft = ev.match
+
+          if vim.tbl_contains(ignore_filetype, ft) then
+            return
+          end
+
+          local lang = vim.treesitter.language.get_lang(ft) or ft
+          local buf = ev.buf
+          pcall(vim.treesitter.start, buf, lang)
+
+          vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+    end,
+  },
+},
 
 	{
 		"nvim-treesitter/nvim-treesitter-context",
