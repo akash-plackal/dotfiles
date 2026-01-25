@@ -1,5 +1,19 @@
 return {
 	{
+		"williamboman/mason.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+ config = function()
+    require("mason").setup()
+  end,
+	},
+	{
+		"williamboman/mason-lspconfig.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+		opts = {
+				ensure_installed = { "jsonls", "eslint", "ts_ls", "cssls", "html" }
+		},
+	},
+	{
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()

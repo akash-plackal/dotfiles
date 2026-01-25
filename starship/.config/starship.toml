@@ -1,4 +1,5 @@
 add_newline = false
+# Removed $jobs and $git_status from the primary view to reduce fork calls
 format = """
 $username\
 $hostname\
@@ -6,9 +7,13 @@ $directory\
 $git_branch\
 $git_status\
 $fill\
-$cmd_duration$jobs\
+$cmd_duration\
 $line_break\
 $character"""
+
+# Global timeout for all modules (default is 500ms, 100ms is snappier)
+command_timeout = 80
+scan_timeout = 30
 
 [fill]
 symbol = " "
@@ -26,22 +31,24 @@ success_symbol = "[;](#b16286)"
 error_symbol = "[;](#cc241d)"
 vicmd_symbol = "[;](#98971a)"
 
+
 [git_branch]
 symbol = " "
-format = "[$symbol$branch]($style) "
+format = "[$symbol$branch]($style)"
 style = "#928374"
+only_attached = true
 
 [git_status]
-format = '([$all_status$ahead_behind]($style) )'
+format = "([$all_status$ahead_behind]($style) )"
 style = "#458588"
-modified = "✱"
-untracked = "✱"
-deleted = "✱"
-renamed = "✱"
-staged = "✱"
+
+ignore_submodules = true
+
 ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+renamed = "»"
+deleted = "✘"
 
 [git_metrics]
 disabled = true
@@ -49,24 +56,8 @@ disabled = true
 [cmd_duration]
 format = "[$duration]($style) "
 style = "#d79921"
-min_time = 2000
+min_time = 5000 # Increased from 2000 to reduce update frequency
 show_milliseconds = false
-
-[jobs]
-symbol = ""
-style = "bold #cc241d"
-number_threshold = 1
-format = "[$symbol]($style)"
-
-[nodejs]
-format = "[$symbol($version )]($style)"
-style = "#98971a"
-symbol = " "
-
-[package]
-format = "[$symbol$version]($style) "
-style = "#d79921"
-symbol = "📦 "
 
 [username]
 style_user = "#98971a"
@@ -79,3 +70,13 @@ show_always = false
 ssh_only = true
 format = "[$hostname](bold #d65d0f) "
 disabled = false
+
+# Explicitly disable heavy language modules you aren't using in the prompt
+[nodejs]
+disabled = true
+
+[package]
+disabled = true
+
+[jobs]
+disabled = true

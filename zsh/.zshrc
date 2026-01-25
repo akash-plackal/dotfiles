@@ -1,3 +1,7 @@
+##### PATH (USER BIN FIRST) #####
+export PATH="$HOME/.local/bin:$PATH"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 ##### VI MODE #####
 bindkey -v
 export KEYTIMEOUT=1
@@ -99,6 +103,8 @@ alias ls="lsd"
 alias l="lsd -l"
 alias ..="cd .."
 alias top="btop"
+alias open="xdg-open"
+alias bc="brew autoremove && brew cleanup"
 
 # Work
 alias rn="npm run dev"
@@ -128,7 +134,7 @@ alias gtr="git-tmux-worktree.sh remove"
 
 
 ##### LAZY NVM #####
-export NVM_DIR="$HOME/.nvm"
+export PATH="$HOME/.nvm/versions/node/v24.12.0/bin:$PATH"
 
 nvm() {
   unset -f nvm node npm npx
@@ -160,3 +166,8 @@ y() {
 ##### ENV + SECRETS #####
 [[ -f "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"
 [[ -f "$HOME/.zsh_secrets" ]] && source "$HOME/.zsh_secrets"
+
+# opencode
+export PATH=/home/akashplackal/.opencode/bin:$PATH
+
+export HOMEBREW_ARCH=arm64

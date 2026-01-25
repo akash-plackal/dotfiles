@@ -1,4 +1,3 @@
--- Completion plugin configuration
 return {
 	{
 		"Saghen/blink.cmp",
@@ -9,9 +8,11 @@ return {
 		},
 		config = function()
 			require("blink.cmp").setup({
+				snippets = { preset = "luasnip" },
+
 				sources = {
 					providers = {
-						snippets = { name = "snippets", opts = { preset = "luasnip" } },
+						snippets = { name = "snippets" },
 						lsp = { name = "lsp" },
 						path = { name = "path" },
 						buffer = { name = "buffer" },
@@ -64,6 +65,7 @@ return {
 				update_events = { "TextChanged", "TextChangedI" },
 			})
 
+			-- Custom snippet loading path
 			require("luasnip.loaders.from_lua").load({ paths = vim.fn.expand("~/.config/nvim/lua/snippets") })
 			vim.keymap.set({ "i", "s" }, "<C-j>", function()
 				ls.jump(1)

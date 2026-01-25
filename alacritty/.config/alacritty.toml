@@ -21,8 +21,6 @@ style = "Bold"
 # =============================
 [window]
 decorations = "None"
-#dynamic_padding = true
-#startup_mode = "Windowed"
 option_as_alt = "Both"
 
  [window.padding]
