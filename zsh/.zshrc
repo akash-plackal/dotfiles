@@ -1,5 +1,6 @@
-##### PATH (USER BIN FIRST) #####
+##### PATH  #####
 export PATH="$HOME/.local/bin:$PATH"
+export MOZ_ENABLE_WAYLAND=1
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 ##### VI MODE #####
@@ -104,6 +105,7 @@ alias l="lsd -l"
 alias ..="cd .."
 alias top="btop"
 alias open="xdg-open"
+alias nano="nvim"
 alias bc="brew autoremove && brew cleanup"
 
 # Work
