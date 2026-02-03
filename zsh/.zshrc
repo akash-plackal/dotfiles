@@ -135,18 +135,22 @@ alias gt="git-tmux-worktree.sh create"
 alias gtr="git-tmux-worktree.sh remove"
 
 
-##### LAZY NVM #####
-export PATH="$HOME/.nvm/versions/node/v24.12.0/bin:$PATH"
+##### LAZY NVM ##### (UPDATED)
+export NVM_DIR="$HOME/.nvm"
+
+# Only add to PATH if the directory exists
+[[ -d "$NVM_DIR/versions/node/v24.12.0/bin" ]] && \
+  export PATH="$NVM_DIR/versions/node/v24.12.0/bin:$PATH"
 
 nvm() {
   unset -f nvm node npm npx
-  source "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   nvm "$@"
 }
 
-node() { nvm >/dev/null; node "$@"; }
-npm()  { nvm >/dev/null; npm "$@"; }
-npx()  { nvm >/dev/null; npx "$@"; }
+node() { nvm >/dev/null 2>&1; command node "$@"; }
+npm()  { nvm >/dev/null 2>&1; command npm "$@"; }
+npx()  { nvm >/dev/null 2>&1; command npx "$@"; }
 
 
 ##### PROMPT + TOOLS #####

@@ -12,30 +12,69 @@ input {
     }
 
     touchpad {
+        // Enable tap-to-click (like macOS)
         tap
+        
+        // Natural scrolling (reversed, like macOS)
         natural-scroll
+        
+        dwt
+        
+        // Clickfinger method: 1-finger = left, 2-finger = right, 3-finger = middle
+        // This matches macOS behavior
+        click-method "clickfinger"
+        
+        // Tap button mapping: left, right, middle for 1, 2, 3 finger taps
+        tap-button-map "left-right-middle"
+        
+        // Adaptive acceleration profile (smoother, like macOS)
+        accel-profile "adaptive"
+        
+        // Acceleration speed: 0.0 is neutral, adjust between -1.0 and 1.0
+        // You may want to tweak this to your preference
+        accel-speed 0.0
+        
+        // Enable drag lock (helps with dragging)
+        drag-lock
+        
+        // Middle button emulation (optional, can disable if not needed)
+        // middle-emulation false
     }
-
-    mouse {
-    }
-
-    trackpoint {
-        natural-scroll
-    }
-
-
+    
+    // If you want to configure specific touchpad devices
+    // You can add device-specific rules like:
+    // 
+    // touchpad {
+    //     match {
+    //         name "Apple Internal Keyboard / Trackpad"
+    //     }
+    //     // ... settings here
+    // }
 }
+
+///-output "eDP-1" {
+
+    //mode "1920x1080@120.030"
+
+    //scale 2
+
+    //transform "normal"
+
+    //position x=1280 y=0
+//}
 
 /-output "eDP-1" {
-
-    mode "1920x1080@120.030"
-
-    scale 2
-
+    // Use native resolution at 60Hz
+    mode "2560x1600@60"
+    
+    // HiDPI scaling (2x like macOS default)
+    scale 2.0
+    
     transform "normal"
-
-    position x=1280 y=0
+    position x=0 y=0
 }
+
+
 
 //layer-rule {
     //match namespace="^wallpaper$"
@@ -113,7 +152,10 @@ layout {
     }
 }
 
-
+environment {
+    XDG_CURRENT_DESKTOP "sway"
+    MOZ_ENABLE_WAYLAND "1"
+}
 
 
 

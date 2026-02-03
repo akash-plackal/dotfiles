@@ -3,7 +3,7 @@ return {
 	-- Telescope with lazy loading
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.8",
+		branch = "master",
 		cmd = "Telescope", -- Only load when Telescope command is used
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
