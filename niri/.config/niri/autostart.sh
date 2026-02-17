@@ -4,6 +4,9 @@
 pkill swaybg
 swaybg -i /home/akashplackal/Downloads/wallpapers/samuraiBg.png -m fill &
 
+
+#walker --gapplication-service
+
 # Ensure any old wl-paste watchers are killed
 pkill wl-paste
 

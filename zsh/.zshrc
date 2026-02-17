@@ -177,3 +177,5 @@ y() {
 export PATH=/home/akashplackal/.opencode/bin:$PATH
 
 export HOMEBREW_ARCH=arm64
+export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:$HOME/go/bin
