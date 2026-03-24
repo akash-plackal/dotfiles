@@ -61,7 +61,8 @@ vim.opt.diffopt:append("algorithm:patience")
 vim.opt.diffopt:append("indent-heuristic")
 
 -- Set colorscheme
-vim.cmd.colorscheme("gruvbox")
+-- color scheme is configured by mini.hues
+--vim.cmd.colorscheme("gruvbox")
 
 -- Custom highlights
 vim.api.nvim_set_hl(0, "DiffText", { fg = "#ffffff", bg = "#1d3b40" })

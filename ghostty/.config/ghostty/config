@@ -18,13 +18,12 @@ mouse-scroll-multiplier = 2
 copy-on-select = clipboard
 
 window-decoration=client
-window-padding-balance = true 
+#window-padding-balance = true 
 window-save-state = always
 window-colorspace = "display-p3"
 #background = 1C2021
 #foreground = d4be98
 
-macos-icon = blueprint
 quit-after-last-window-closed = true
 confirm-close-surface = false
 

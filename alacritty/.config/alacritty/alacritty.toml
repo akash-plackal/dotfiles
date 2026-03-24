@@ -1,0 +1,29 @@
+# Path: ~/.config/alacritty/alacritty.toml
+
+[font]
+size = 21
+builtin_box_drawing = true
+
+[font.normal]
+family = "IosevkaTerm Nerd Font"
+style = "Light"
+
+[font.bold]
+family = "IosevkaTerm Nerd Font"
+style = "Bold"
+
+[font.offset]
+y = 4
+
+[window]
+decorations = "None"
+option_as_alt = "Both"
+startup_mode = "Maximized"
+padding = { x = 1, y = 1 }
+
+[cursor]
+unfocused_hollow = false
+
+[cursor.style]
+blinking = "Always"
+shape = "Beam"

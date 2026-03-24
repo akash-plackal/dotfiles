@@ -4,9 +4,6 @@ return {
 
 	{ "folke/lazy.nvim", tag = "stable" },
 
-	{ "nvim-lua/plenary.nvim" },
-
-	{ "ellisonleao/gruvbox.nvim" },
 	{
 		"stevearc/conform.nvim",
 		event = { "BufReadPost", "BufNewFile" },
