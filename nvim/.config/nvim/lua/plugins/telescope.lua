@@ -1,11 +1,71 @@
 -- Telescope and related plugins
+
+-- Themes are built lazily: get_dropdown/get_ivy/get_cursor need telescope on
+-- the runtimepath, which is only true once lazy.nvim has loaded the plugin.
+local function picker(name, theme, theme_opts)
+	return function()
+		local themes = require("telescope.themes")
+		require("telescope.builtin")[name](themes["get_" .. theme](theme_opts or { path_display = { "smart" } }))
+	end
+end
+
+-- Live-grep restricted to the files currently in the quickfix list.
+local function grep_quickfix_files()
+	local files = {}
+	for _, item in ipairs(vim.fn.getqflist()) do
+		local fname = vim.fn.bufname(item.bufnr)
+		if fname and fname ~= "" then
+			files[fname] = true
+		end
+	end
+
+	local file_list = vim.tbl_keys(files)
+	if #file_list == 0 then
+		vim.notify("No files in quickfix list", vim.log.levels.WARN)
+		return
+	end
+
+	require("telescope.builtin").live_grep({
+		search_dirs = file_list,
+		prompt_title = "Grep Quickfix Files",
+	})
+end
+
 return {
 	-- Telescope with lazy loading
 	{
 		"nvim-telescope/telescope.nvim",
 		branch = "master",
-		cmd = "Telescope", -- Only load when Telescope command is used
-		dependencies = { "nvim-lua/plenary.nvim" },
+		cmd = "Telescope",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-telescope/telescope-fzf-native.nvim",
+		},
+		-- These MUST live in `keys`, not in config(). Defining them inside
+		-- config() means they only exist after telescope has already loaded,
+		-- and nothing else pulls telescope in -- so they would never fire.
+		-- lazy.nvim installs a stub for each and loads telescope on first press.
+		keys = {
+			-- Files
+			{
+				"<leader>fd",
+				picker("find_files", "dropdown", { previewer = false, width = 0.6, height = 0.6 }),
+				desc = "Find Files (dropdown)",
+			},
+			{ "<leader>fp", picker("find_files", "ivy"), desc = "Find Files (Project)" },
+			{ "<leader>fo", picker("oldfiles", "ivy"), desc = "Find Old Files" },
+			-- Search
+			{ "<leader>fg", picker("live_grep", "ivy"), desc = "Live Grep" },
+			{ "<leader>fw", picker("grep_string", "ivy"), desc = "Grep Word Under Cursor" },
+			{ "<leader>gq", grep_quickfix_files, desc = "Grep Quickfix Files" },
+			-- Git
+			{ "<leader>fh", picker("git_status", "ivy"), desc = "Git Status" },
+			{ "<leader>gb", picker("git_branches", "ivy"), desc = "Git Branches" },
+			-- LSP
+			{ "<leader>fs", picker("lsp_document_symbols", "cursor"), desc = "LSP Document Symbols" },
+			-- Meta
+			{ "<leader>fe", picker("resume", "ivy"), desc = "Resume Last Telescope" },
+		},
 		config = function()
 			local telescope = require("telescope")
 			local builtin = require("telescope.builtin")
@@ -33,10 +93,8 @@ return {
 					sorting_strategy = "ascending",
 					layout_strategy = "horizontal",
 					winblend = 0,
-					border = {},
 					borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
 					color_devicons = true,
-					use_less = true,
 					path_display = { "smart" },
 					set_env = { ["COLORTERM"] = "truecolor" },
 				},
@@ -86,104 +144,13 @@ return {
 
 			-- Load extensions
 			telescope.load_extension("fzf")
-
-			-- Custom function for grepping quickfix files
-			local function grep_quickfix_files()
-				local qf_list = vim.fn.getqflist()
-				local files = {}
-				for _, item in ipairs(qf_list) do -- Fixed: was qf*list
-					local bufnr = item.bufnr
-					local fname = vim.fn.bufname(bufnr)
-					if fname and fname ~= "" then
-						files[fname] = true
-					end
-				end
-				local file_list = vim.tbl_keys(files)
-				if #file_list == 0 then
-					vim.notify("No files in quickfix list", vim.log.levels.WARN)
-					return
-				end
-				builtin.live_grep({
-					search_dirs = file_list,
-					prompt_title = "Grep Quickfix Files",
-				})
-			end
-
-			-- Define common themes
-			local themes = require("telescope.themes")
-			local dropdown_theme = themes.get_dropdown({
-				previewer = false,
-				width = 0.6,
-				height = 0.6,
-			})
-			local ivy_theme = themes.get_ivy({
-				path_display = { "smart" },
-			})
-			local cursor_theme = themes.get_cursor({
-				path_display = { "smart" },
-			})
-
-			-- Keymaps with better organization and descriptions
-			local keymap = vim.keymap.set
-			local opts = { noremap = true, silent = true }
-
-			-- File operations
-			keymap("n", "<leader>fd", function()
-				builtin.fd(dropdown_theme)
-			end, vim.tbl_extend("force", opts, { desc = "Find Files (fd)" }))
-
-			keymap("n", "<leader>fp", function()
-				builtin.find_files(ivy_theme)
-			end, vim.tbl_extend("force", opts, { desc = "Find Files (Project)" }))
-
-			keymap("n", "<leader>fo", function()
-				builtin.oldfiles(ivy_theme)
-			end, vim.tbl_extend("force", opts, { desc = "Find Old Files" }))
-
-			-- Search operations
-			keymap("n", "<leader>fg", function()
-				builtin.live_grep(ivy_theme)
-			end, vim.tbl_extend("force", opts, { desc = "Live Grep" }))
-
-			keymap("n", "<leader>fw", function()
-				builtin.grep_string(ivy_theme)
-			end, vim.tbl_extend("force", opts, { desc = "Grep Word Under Cursor" }))
-
-			keymap(
-				"n",
-				"<leader>gq",
-				grep_quickfix_files,
-				vim.tbl_extend("force", opts, { desc = "Grep Quickfix Files" })
-			)
-
-			-- Git operations
-
-			keymap("n", "<leader>fh", function()
-				builtin.git_status(ivy_theme)
-			end, vim.tbl_extend("force", opts, { desc = "Git Status" }))
-
-			keymap("n", "<leader>gb", function()
-				builtin.git_branches(ivy_theme)
-			end, vim.tbl_extend("force", opts, { desc = "Git Branches" }))
-
-			-- LSP operations
-			keymap("n", "<leader>fs", function()
-				builtin.lsp_document_symbols(cursor_theme)
-			end, vim.tbl_extend("force", opts, { desc = "LSP Document Symbols" }))
-
-			-- Telescope meta operations
-			keymap("n", "<leader>fe", function()
-				builtin.resume(ivy_theme)
-			end, vim.tbl_extend("force", opts, { desc = "Resume Last Telescope" }))
 		end,
 	},
 	{
+		-- Native fzf sorter. Loaded as a telescope dependency so that
+		-- telescope.load_extension("fzf") above always finds it.
 		"nvim-telescope/telescope-fzf-native.nvim",
 		build = "make",
-		dependencies = { "nvim-telescope/telescope.nvim" },
-		config = function()
-			-- Ensure fzf extension is loaded after telescope setup
-			require("telescope").load_extension("fzf")
-		end,
+		lazy = true,
 	},
 }

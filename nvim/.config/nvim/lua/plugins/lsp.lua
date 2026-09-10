@@ -1,63 +1,104 @@
+-- LSP: Neovim 0.11+ native model.
+--   * nvim-lspconfig is now only a *data* repository of `lsp/<server>.lua` files.
+--   * Servers are configured with vim.lsp.config() and turned on with vim.lsp.enable().
+--   * mason-lspconfig v2 calls vim.lsp.enable() for every installed server itself
+--     (`automatic_enable`), so there is no setup_handlers() dance any more.
+--   * Float borders come from the global 'winborder' option (see config/options.lua),
+--     so the old vim.lsp.handlers / open_floating_preview monkey-patching is gone.
 return {
 	{
-		"williamboman/mason.nvim",
-		event = { "BufReadPre", "BufNewFile" },
- config = function()
-    require("mason").setup()
-  end,
-	},
-	{
-		"williamboman/mason-lspconfig.nvim",
+		"mason-org/mason.nvim",
+		cmd = { "Mason", "MasonInstall", "MasonUpdate" },
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
-				ensure_installed = { "jsonls", "eslint", "ts_ls", "cssls", "html" }
+			ui = { border = "rounded" },
 		},
 	},
+
+	{
+		"mason-org/mason-lspconfig.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			"mason-org/mason.nvim",
+			"neovim/nvim-lspconfig",
+		},
+		opts = {
+			ensure_installed = { "jsonls", "eslint", "ts_ls", "cssls", "html", "lua_ls" },
+			automatic_enable = true,
+		},
+	},
+
+	-- mason.nvim only manages LSP servers via mason-lspconfig; formatters and
+	-- linters need this to be installed declaratively.
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = { "mason-org/mason.nvim" },
+		opts = {
+			ensure_installed = {
+				"prettierd", -- JS/TS/CSS/HTML/JSON/YAML/Markdown formatting (conform.nvim)
+				"stylua", -- Lua formatting (conform.nvim)
+			},
+			run_on_start = true,
+			auto_update = false,
+		},
+	},
+
 	{
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
-			-- Configure LSP borders
-			local border = "single"
-			-- Configure border colors/background (Gruvbox Dark)
-			vim.api.nvim_set_hl(0, "FloatBorder", {
-				fg = "#665c54", -- gruvbox gray (border color)
-				bg = "#3c3836", -- gruvbox bg1 (background color)
-			})
-			vim.api.nvim_set_hl(0, "NormalFloat", {
-				bg = "#3c3836", -- gruvbox bg1 (floating window background)
-			})
+			---------------------------------------------------------------------
+			-- Server configuration
+			---------------------------------------------------------------------
 
-			-- Configure LSP handlers with borders
-			local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-			function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-				opts = opts or {}
-				opts.border = opts.border or border
-				return orig_util_open_floating_preview(contents, syntax, opts, ...)
-			end
-			vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-				border = border,
-			})
-			vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-				border = border,
-			})
-			-- Configure diagnostic float with borders
-			vim.diagnostic.config({
-				float = {
-					border = border,
+			-- Applies to every server on top of what nvim-lspconfig ships.
+			vim.lsp.config("*", {
+				capabilities = {
+					textDocument = {
+						completion = { completionItem = { snippetSupport = true } },
+					},
 				},
 			})
 
-			-- LSP Mappings + Settings
-			local opts = { noremap = true, silent = true }
-			vim.keymap.set("n", "<space>d", vim.diagnostic.open_float, opts)
-			vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, opts)
+			vim.lsp.config("lua_ls", {
+				settings = {
+					Lua = {
+						workspace = { checkThirdParty = false },
+						telemetry = { enable = false },
+					},
+				},
+			})
 
-			-- Function to filter references
+			vim.lsp.config("ts_ls", {
+				settings = {
+					typescript = {
+						inlayHints = {
+							includeInlayParameterNameHints = "literals",
+							includeInlayFunctionParameterTypeHints = true,
+							includeInlayVariableTypeHints = false,
+							includeInlayPropertyDeclarationTypeHints = true,
+							includeInlayFunctionLikeReturnTypeHints = true,
+						},
+					},
+					javascript = {
+						inlayHints = {
+							includeInlayParameterNameHints = "literals",
+							includeInlayFunctionParameterTypeHints = true,
+							includeInlayVariableTypeHints = false,
+						},
+					},
+				},
+			})
+
+			---------------------------------------------------------------------
+			-- References picker that skips imports/re-exports and test files
+			---------------------------------------------------------------------
+
 			local function filter_references()
 				local current_file = vim.fn.expand("%:p")
 
-				local function filtered_references_handler(err, result, ctx, config)
+				local function filtered_references_handler(err, result, ctx)
 					if err then
 						vim.notify(tostring(err.message), vim.log.levels.ERROR)
 						return
@@ -123,18 +164,7 @@ return {
 							goto continue
 						end
 
-						-- Check starts with "import"
-						if s:sub(1, 6) == "import" then
-							goto continue
-						end
-
-						-- Check starts with "from"
-						if s:sub(1, 4) == "from" then
-							goto continue
-						end
-
-						-- Check starts with "export"
-						if s:sub(1, 6) == "export" then
+						if s:sub(1, 6) == "import" or s:sub(1, 4) == "from" or s:sub(1, 6) == "export" then
 							goto continue
 						end
 
@@ -166,123 +196,98 @@ return {
 				vim.lsp.buf_request(0, "textDocument/references", params, filtered_references_handler)
 			end
 
-			local on_attach = function(client, bufnr)
-				vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-				local bufopts = { noremap = true, silent = true, buffer = bufnr }
-				vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
-				vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
-				vim.keymap.set("n", "gk", vim.lsp.buf.hover, bufopts)
-				vim.keymap.set("n", "gK", vim.lsp.buf.signature_help, bufopts)
-				vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
-				vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts)
-				vim.keymap.set("n", "ge", vim.diagnostic.open_float, bufopts)
-				-- Use filtered references instead of default
-				vim.keymap.set("n", "gi", filter_references, bufopts)
-				vim.keymap.set("n", "<space>fm", function()
-					vim.lsp.buf.format({ async = true })
-				end, bufopts)
-				vim.keymap.set("n", "<space>oi", function()
-					vim.lsp.buf.execute_command({
-						command = "_typescript.organizeImports",
-						arguments = { vim.fn.expand("%:p") },
-					})
-				end, bufopts)
-				vim.keymap.set("n", "<space>fq", function()
-					vim.diagnostic.setqflist({
-						title = "All Diagnostics",
-						severity = nil,
-					})
-				end, bufopts)
-				vim.keymap.set("n", "<space>cx", function()
-					vim.lsp.buf.code_action({
-						context = {
-							only = { "quickfix" },
-							diagnostics = vim.diagnostic.get(0),
-						},
-						apply = false,
-					})
-				end, bufopts)
+			---------------------------------------------------------------------
+			-- Buffer-local setup, driven by LspAttach (works with automatic_enable)
+			---------------------------------------------------------------------
 
-				vim.keymap.set("n", "go", function()
-					-- Find the default export from the end of the file
-					local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-					local target_line = 0
-
-					-- Search from the end for "export default"
-					for i = #lines, 1, -1 do
-						if lines[i]:match("export%s+default") then
-							target_line = i
-							break
-						end
+			vim.api.nvim_create_autocmd("LspAttach", {
+				group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true }),
+				callback = function(ev)
+					local client = vim.lsp.get_client_by_id(ev.data.client_id)
+					if not client then
+						return
 					end
 
-					-- Fallback: if no default export found, search from top for any export
-					if target_line == 0 then
-						for i, line in ipairs(lines) do
-							if line:match("^export") then
+					local bufopts = function(desc)
+						return { noremap = true, silent = true, buffer = ev.buf, desc = desc }
+					end
+
+					-- Neovim already maps grn/gra/grr/gri/grt/gO/K/<C-s>; these are the extras.
+					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts("Go to declaration"))
+					vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts("Go to definition"))
+					vim.keymap.set("n", "gk", vim.lsp.buf.hover, bufopts("Hover"))
+					vim.keymap.set("n", "gK", vim.lsp.buf.signature_help, bufopts("Signature help"))
+					vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, bufopts("Type definition"))
+					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, bufopts("Code action"))
+					vim.keymap.set("n", "gi", filter_references, bufopts("References (filtered)"))
+
+					vim.keymap.set("n", "<leader>fm", function()
+						vim.lsp.buf.format({ async = true })
+					end, bufopts("Format buffer"))
+
+					vim.keymap.set("n", "<leader>cx", function()
+						vim.lsp.buf.code_action({
+							context = { only = { "quickfix" }, diagnostics = vim.diagnostic.get(0) },
+							apply = false,
+						})
+					end, bufopts("Quickfix code action"))
+
+					-- Organize imports. vim.lsp.buf.execute_command() is deprecated;
+					-- the LSP-standard way is the source.organizeImports code action.
+					vim.keymap.set("n", "<leader>oi", function()
+						vim.lsp.buf.code_action({
+							context = { only = { "source.organizeImports" }, diagnostics = {} },
+							apply = true,
+						})
+					end, bufopts("Organize imports"))
+
+					-- References to this module's default export
+					vim.keymap.set("n", "go", function()
+						local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+						local target_line = 0
+
+						for i = #lines, 1, -1 do
+							if lines[i]:match("export%s+default") then
 								target_line = i
 								break
 							end
 						end
+
+						if target_line == 0 then
+							for i, line in ipairs(lines) do
+								if line:match("^export") then
+									target_line = i
+									break
+								end
+							end
+						end
+
+						local saved_pos = vim.api.nvim_win_get_cursor(0)
+						if target_line ~= 0 then
+							vim.api.nvim_win_set_cursor(0, { target_line, 0 })
+						end
+						filter_references()
+						vim.api.nvim_win_set_cursor(0, saved_pos)
+					end, bufopts("References to default export"))
+
+					-- NOTE: vim.lsp.foldexpr() (0.11+) is deliberately NOT enabled here --
+					-- it would clobber the custom import-folding foldexpr that
+					-- lua/plugins/ui.lua installs for JS/TS buffers.
+
+					-- 0.11+: inlay hints, off by default, toggled with <leader>th
+					if client:supports_method("textDocument/inlayHint") then
+						vim.keymap.set("n", "<leader>th", function()
+							local filter = { bufnr = ev.buf }
+							vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter), filter)
+						end, bufopts("Toggle inlay hints"))
 					end
 
-					-- Save current position
-					local saved_pos = vim.api.nvim_win_get_cursor(0)
-
-					-- Jump to the export line (if found)
-					if target_line ~= 0 then
-						vim.api.nvim_win_set_cursor(0, { target_line, 0 })
+					-- 0.12: rename all occurrences of a tag/symbol as you type
+					if client:supports_method("textDocument/linkedEditingRange") then
+						vim.lsp.linked_editing_range.enable(true, { bufnr = ev.buf })
 					end
-
-					-- Call your existing filtered references function
-					filter_references()
-
-					-- Restore cursor position
-					vim.api.nvim_win_set_cursor(0, saved_pos)
-				end, bufopts)
-			end
-
-			-- Use existing capabilities:
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			capabilities.textDocument.completion.completionItem.snippetSupport = true
-
-			-- === NEW: define & enable servers via vim.lsp.config / vim.lsp.enable ===
-			-- Common server options to merge
-			local common_opts = {
-				on_attach = on_attach,
-				capabilities = capabilities,
-			}
-
-			-- helper to merge and register a server config then enable it
-			local function register_and_enable(name, cfg)
-				cfg = vim.tbl_deep_extend("force", common_opts, cfg or {})
-				-- define the server config
-				-- you can use either assignment or function-call API; both work:
-				vim.lsp.config[name] = cfg
-				-- enable the server (activation for matching filetypes)
-				vim.lsp.enable(name)
-			end
-
-			-- Servers with the same/basic config
-			local servers = { "jsonls", "eslint" }
-			for _, name in ipairs(servers) do
-				register_and_enable(name, {})
-			end
-
-			register_and_enable("ts_ls", {
-				cmd = { "typescript-language-server", "--stdio" },
+				end,
 			})
-
-			-- Servers with explicit/extra config
-			register_and_enable("cssls", {
-				-- add cssls specifics here if you want (cmd, filetypes, settings, etc)
-			})
-
-			register_and_enable("html", {
-				-- add html specifics here if you want
-			})
-
-			-- End of LSP setup
 		end,
 	},
 }

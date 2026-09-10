@@ -5,8 +5,8 @@ local M = {}
 function M.setup()
 	-- Bootstrap lazy.nvim
 	local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-	if not vim.loop.fs_stat(lazypath) then
-		vim.fn.system({
+	if not vim.uv.fs_stat(lazypath) then
+		local out = vim.fn.system({
 			"git",
 			"clone",
 			"--filter=blob:none",
@@ -14,6 +14,9 @@ function M.setup()
 			"--branch=stable", -- latest stable release
 			lazypath,
 		})
+		if vim.v.shell_error ~= 0 then
+			error("Failed to clone lazy.nvim:\n" .. out)
+		end
 	end
 	vim.opt.rtp:prepend(lazypath)
 
@@ -33,11 +36,20 @@ function M.setup()
 					"tohtml",
 					"tutor",
 					"zipPlugin",
+					"netrwPlugin",
+					"matchit",
+					"matchparen",
+					"rplugin",
+					"spellfile",
 				},
 			},
 		},
 		change_detection = {
 			notify = false, -- Don't show notifications when plugin files change
+		},
+		checker = {
+			enabled = true, -- Check for plugin updates in the background
+			notify = false,
 		},
 		ui = {
 			border = "rounded", -- Add rounded borders to the Lazy UI
