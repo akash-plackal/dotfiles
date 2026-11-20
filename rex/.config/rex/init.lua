@@ -3,6 +3,10 @@
 -- Rex has no global prefix setting; represent tmux's C-a prefix as a key sequence.
 local prefix = "ctrl+a>"
 
+-- Rex navigation
+rex.bind("cmd+p", "pane.go_to")
+rex.bind("shift+cmd+p", "client.palette.toggle")
+
 -- Prefix + split panes
 -- Prefix + | (press Shift+Backslash).
 rex.bind(prefix .. "shift+\\", "pane.split", {
@@ -43,26 +47,8 @@ rex.bind(prefix .. "l", "pane.focus", { direction = "right" })
 -- Prefix + reload Rex config
 rex.bind(prefix .. "r", "client.config.reload")
 
--- Prefix + C-o: open a larger floating pane (80% of the window).
-rex.action{
-	name = "new_large_floating",
-	title = "New Large Floating Pane",
-	run = function(ctx)
-		local result, err = rex.session.new_layer{
-			session_id = ctx.session_id,
-			bounds = { 0.1, 0.1, 0.8, 0.8 },
-			focus = true,
-			layout = rex.layout.block{
-				flavor = "com.superlogical.terminal.shell",
-			},
-		}
-		if not result then
-			error(err)
-		end
-		return result
-	end,
-}
-rex.bind(prefix .. "ctrl+o", "new_large_floating")
+-- Prefix + C-o: closest built-in equivalent to tmux display-popup
+rex.bind(prefix .. "ctrl+o", "pane.new_floating")
 
 -- Prefix twice sends C-a to the shell
 rex.bind(prefix .. "ctrl+a", "pane.send_key", {
